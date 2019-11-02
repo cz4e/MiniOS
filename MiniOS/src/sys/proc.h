@@ -53,6 +53,7 @@ struct thread {
     int                 td_factor;                  /* for interactice process      */
     int                 td_retcode;                 /* return code                  */
     int                 td_priority;                /* Thread's priority            */
+    int                 td_cpuid;                   /* cpu which thread run         */
     char                td_name[MAX_NAME - 1];      /* Thread's name                */
 };
 

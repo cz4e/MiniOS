@@ -56,7 +56,7 @@ struct {                                                \
     (LIST_FIRST((head)) = NULL)
 
 #define LIST_ENTRY_INIT(elm,field)                      \
-    (LIST_NEXT((elm),field) = NULL,LIST_PREV((elm),field) = NULL)
+    (LIST_NEXT((elm),field) = LIST_PREV((elm),field) = NULL)
 
 #define LIST_INSERT_HEAD(head,elm,field)                do{\
                                                             LIST_PREV((elm),field) = LIST_FIRST((head));            \
@@ -73,13 +73,22 @@ struct {                                                \
 
 #define LIST_INSERT_BEFOR(obj,elm,field)                do{\
                                                             LIST_PREV((elm),field) = LIST_PREV((obj),field);        \
-                                                            LIST_NEXT(*(LIST_PREV((obj),field))) = (elm);             \
+                                                            LIST_NEXT(*(LIST_PREV((obj),field))) = (elm);           \
                                                             LIST_NEXT((elm),field) = (obj);                         \
                                                         }while(0)
-                                                        
-#define LIST_REMOVE_HEAD(head,elm)                      do{\
 
+#define LIST_REMOVE_HEAD(head,elm,field)                do{\
+                                                            LIST_FIRST((head)) =  LIST_NEXT((elm),field);           \
+                                                            LIST_PREV(LIST_NEXT((elm),field),field) = NULL;         \
+                                                        }while(0)
 
+#define LIST_REMOVE(elm,field)                          do{\
+                                                            if(LIST_NEXT((elm),field)) {                            \
+                                                                LIST_PREV(LIST_NEXT((elm),field),field) = LIST_PREV((elm),field);   \
+                                                                LIST_NEXT(*LIST_PREV((elm),field),field) = LIST_NEXT((elm),filed);  \
+                                                            } else {                                                                \
+                                                                LIST_NEXT(*LIST_PREV((elm),field)) = NULL;                          \
+                                                            }                                                                       \
                                                         }while(0)
 #define LIST_FOREACH(var,head,field)                    \
         for((var) = LIST_FIRST((head));                 \
@@ -90,7 +99,7 @@ struct {                                                \
         LIST_FOREACH((var),(head),field) {              \
             if((obj)->key > (var)->key) {               \
                 if((head)->lh_first == (var)) {         \
-                    LIST_INSERT_HEAD((head),(obj));     \
+                    LIST_INSERT_HEAD((head),(obj),field);     \
                 } else {                                \
                     LIST_INSERT_BEFOR((var),(obj),field);\
                 }                                       \

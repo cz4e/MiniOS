@@ -5,7 +5,6 @@
 #include <sys/bitstring.h>
 
 
-
 struct proc *curproc;
 struct thread *curthread;
 static struct proc *proc_idle;
@@ -141,7 +140,7 @@ proc_init(struct proc *p, struct thread *td, struct proc *parent,
     p->p_flags = flags;
     p->p_priority = pri == SET_DEFAULT ? DEFAULT_PRIORITY : pri;
     p->p_states |= PS_NEW;
-    p->p_mtx = MTX_INITIALIZER;
+    p->p_mtx = MTX_INITIALIZER; //undefined
     LIST_HEAD_INIT(p,p_childrens);
     proc_insert(p,cpuid);
 
@@ -200,17 +199,61 @@ proc_exit(struct proc *p)
 {
     int ret = p->p_rthread->td_retcode;
     struct thread *td;
+    struct proc *oldp;
+    struct pcpu *pcpu = PCPU_GET(p->p_cpuid);
+    
+    for(oldp = LIST_FIRST(&(pcpu->pcpu_list));
+        oldp != p;
+        oldp = LIST_NEXT(oldp,p_list));
+    
+    if(oldp->p_list.le_prev == NULL) {
+        LIST_REMOVE_HEAD(&(pcpu->pcpu_list));
+    } else {
+        LIST_REMOVE(oldp,p_list);
+    }
+
+    LIST_FOREACH(td,&(p->p_threads),td_list) {
+        
+        ret = thread_exit(td);
+    }
     // release resources
     // disconnect from a list
     // free structures
-    return (ret)
+    return (ret);
+}
+
+int 
+thread_exit(struct thread *td)
+{
+    struct pcpu *pcpu = PCPU_GET(td->td_cpuid);
+    int pri = td->td_priority % PRIORITY_STEP;
+    struct thread *oldtd;
+
+    if(td->td_state & (TDS_NEW | TDS_READY | TDS_RUNNING)) 
+        LIST_FOREACH(oldtd,&(pcpu->pcpu_runq[pri]),td_runq) {
+            if(oldtd->td_runq.le_prev == NULL) {
+                LIST_REMOVE_HEAD(&(pcpu->pcpu_runq[pri]));
+            } else {
+                LIST_REMOVE(oldtd,td_runq);
+            }
+        }
+    else if(td->td_state & (TDS_SLEEPING))
+        LIST_FOREACH(oldtd,&(pcpu->pcpu_sleepq[pri]),td_sleepq) {
+            if(oldtd->td_sleepq.le_prev == NULL) {
+                LIST_REMOVE_HEAD(&(pcpu->pcpu_sleepq[pri]));
+            } else {
+                LIST_REMOVE(oldtd,td_sleepq);
+            }
+        }
+    // release thread's resouces
+    // free thread's structure
 }
 
 int
 proc_kill(pid_t pid)
 {
     int ret;
-    struct proc *p;
+    struct proc *p,**procp;
     if(curproc->p_pid == pid) {
         ret = proc_exit(curproc);
         return (ret);
@@ -224,11 +267,12 @@ proc_kill(pid_t pid)
         }
     }
 
-    for(p = curproc;p;p = LIST_PREV(p,p_list)) {
-        if(p->p_pid == pid) {
-            ret = proc_exit(p);
+    for(procp = &curproc;*procp;procp = LIST_PREV(p,p_list)) {
+        if((*procp)->p_pid == pid) {
+            ret = proc_exit(*procp);
             return (ret);
         }
     }
+
 }
 
