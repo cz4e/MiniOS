@@ -1,7 +1,7 @@
 #ifndef _MIPS__TYPES_H_
 #define _MIPS__TYPES_H_
 
-#include <mips/_limits.h>
+#include <mips/include/_limits.h>
 
 typedef char                        __int8_t;
 typedef unsigned char               __uint8_t;

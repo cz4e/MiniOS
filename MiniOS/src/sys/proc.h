@@ -10,11 +10,17 @@
 
 
 #if     defined     __MIPS__
-#include <mips/pcb.h>
+#include <mips/include/pcb.h>
 #elif   defined     __X86__
-#include <x86/pcb.h>
+#include <x86/include/pcb.h>
 #endif
 
+#define DEFAULT_PRIORITY            100
+#define SET_DEFAULT                 -1
+#define PID_MAX                     99999
+#define NO_PID                      (PID_MAX + 1)
+#define TID_MAX                     PID_MAX
+#define NO_TID                      NO_PID
 #define MAX_NAME                    256
 struct proc;
 
@@ -49,6 +55,8 @@ struct thread {
     int                 td_priority;                /* Thread's priority            */
     char                td_name[MAX_NAME - 1];      /* Thread's name                */
 };
+
+
 
 struct proc {
     LIST_HEAD(,thread)  p_threads;                  /* Proc's all threads           */

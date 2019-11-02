@@ -50,8 +50,3 @@ sched_choose(int cpuid,int queue,int pri)
     return (td);
 }
 
-void 
-sched_switch(struct thread *td)
-{
-    
-}

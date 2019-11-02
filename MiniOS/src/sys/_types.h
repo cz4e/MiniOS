@@ -3,7 +3,7 @@
 
 
 #ifdef __MIPS__
-#include <mips/_types.h>
+#include <mips/include/_types.h>
 #endif
 
 typedef unsigned int        __useconds_t;

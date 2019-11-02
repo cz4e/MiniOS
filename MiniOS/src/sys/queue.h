@@ -18,13 +18,13 @@ struct {                                                \
 #define SLIST_NEXT(elm,head)            ((head)->field.sle_next)
 #define SLIST_FIRST(head)               ((head)->slh_first)
 #define SLIST_INSERT_HEAD(head,elm,field)               do{\
-                                                            (elm)->field.sle_next = SLIST_FIRST((head))     \
-                                                            (head)->slh_first = &(elm)->field;              \
+                                                            SLIST_NEXT((elm),field) = SLIST_FIRST((head));  \
+                                                            SLIST_FIRST((head)) = (elm);                    \
                                                         }while(0)
 
 #define SLIST_INSERT_AFTER(obj,elm,field)               do{\
                                                             SLIST_NEXT((elm),field) = SLIST_NEXT((obj),field);  \
-                                                            SLIST_NEXT((obj),field) = &(elm)->field;            \
+                                                            SLIST_NEXT((obj),field) = (elm);                    \
                                                         }while(0)
 
 #define SLIST_FOREACH(var,head,field)                   \
@@ -32,8 +32,8 @@ struct {                                                \
     (var);                                              \
     (var) = SLIST((var),field))
 
-#define SLIST_HEAD_INIT(elm,field)                      \
-    ((elm)->field.slh_first = NULL)     
+#define SLIST_HEAD_INIT(head,field)                     \
+    (SLIST_FISRT((head)) = NULL)     
                                                   
 #define LIST_HEAD(name,type)                            \
 struct name {                                           \
@@ -46,31 +46,37 @@ struct {                                                \
     struct type **le_prev;                              \
 }
 
-#define LIST_HEAD_INIT(elm,field)                       \
-    ((elm)->field.lh_first = NULL)
 
-#define LIST_ENTRY_INIT(elm,field)                      \
-    ((elm)->field.le_next = NULL,(elm)->field.le_prev = NULL)
+
 #define LIST_EMPTY(head)                ((head)->lh_first == NULL)
 #define LIST_NEXT(elm,field)            ((elm)->field.le_next)
 #define LIST_PREV(elm,field)            ((elm)->field.le_prev)
 #define LIST_FIRST(head)                ((head)->le_first)
+#define LIST_HEAD_INIT(head,field)                      \
+    (LIST_FIRST((head)) = NULL)
+
+#define LIST_ENTRY_INIT(elm,field)                      \
+    (LIST_NEXT((elm),field) = NULL,LIST_PREV((elm),field) = NULL)
+
 #define LIST_INSERT_HEAD(head,elm,field)                do{\
-                                                            (elm)->field.le_next = LIST_FIRST((head));      \
-                                                            LIST_PREV(LIST_FIRST((head)),field) = (elm);    \
-                                                            (head)->lh_first = &(elm)->field;               \
+                                                            LIST_PREV((elm),field) = LIST_FIRST((head));            \
+                                                            LIST_PREV(LIST_FIRST((head)),field) = &(elm);           \
+                                                            (head)->lh_first = (elm);                               \
                                                         }while(0)
 
 #define LIST_INSERT_AFTER(obj,elm,field)                do{\
-                                                            (elm)->field.le_next = LIST_NEXT(obj,field);                \
-                                                            LIST_PREV(LIST_NEXT(obj,field),field) = &(elm)->field;      \
-                                                            (elm)->field.le_prev = &(obj)->field;                       \
-                                                            LIST_NEXT(obj,field) = (elm);                               \
+                                                            LIST_NEXT((elm),field) = LIST_NEXT((obj),field);                \
+                                                            LIST_PREV(LIST_NEXT((obj),field),field) = &(elm);               \
+                                                            LIST_PREV((elm),field) = &(obj);                                \
+                                                            LIST_NEXT((obj),field) = (elm);                                 \
                                                         }while(0)
 
 #define LIST_INSERT_BEFOR(obj,elm,field)                do{\
-
+                                                            LIST_PREV((elm),field) = LIST_PREV((obj),field);        \
+                                                            LIST_NEXT(*(LIST_PREV((obj),field))) = (elm);             \
+                                                            LIST_NEXT((elm),field) = (obj);                         \
                                                         }while(0)
+                                                        
 #define LIST_REMOVE_HEAD(head,elm)                      do{\
 
 
