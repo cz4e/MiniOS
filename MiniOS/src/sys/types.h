@@ -25,4 +25,6 @@ typedef __size_t                size_t;
 
 typedef __time_t                time_t;
 typedef __utime_t               utime_t;
+
+typedef __uintptr_t             uintptr_t;
 #endif

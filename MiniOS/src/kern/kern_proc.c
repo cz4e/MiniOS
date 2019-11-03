@@ -229,7 +229,7 @@ thread_exit(struct thread *td)
     int pri = td->td_priority % PRIORITY_STEP;
     struct thread *oldtd;
 
-    if(td->td_state & (TDS_NEW | TDS_READY | TDS_RUNNING)) 
+    if(td->td_state & (TDS_NEW | TDS_READY | TDS_RUNNING)) {
         LIST_FOREACH(oldtd,&(pcpu->pcpu_runq[pri]),td_runq) {
             if(oldtd->td_runq.le_prev == NULL) {
                 LIST_REMOVE_HEAD(&(pcpu->pcpu_runq[pri]));
@@ -237,7 +237,8 @@ thread_exit(struct thread *td)
                 LIST_REMOVE(oldtd,td_runq);
             }
         }
-    else if(td->td_state & (TDS_SLEEPING))
+    }
+    else if(td->td_state & (TDS_SLEEPING)) {
         LIST_FOREACH(oldtd,&(pcpu->pcpu_sleepq[pri]),td_sleepq) {
             if(oldtd->td_sleepq.le_prev == NULL) {
                 LIST_REMOVE_HEAD(&(pcpu->pcpu_sleepq[pri]));
@@ -245,6 +246,7 @@ thread_exit(struct thread *td)
                 LIST_REMOVE(oldtd,td_sleepq);
             }
         }
+    }
     // release thread's resouces
     // free thread's structure
 }
