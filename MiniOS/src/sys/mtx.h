@@ -10,9 +10,13 @@
 #define mtx_owner(m)            _mtx_owner(MTX_READ_VALUE(m))
 #define mtx_owned(m)            (mtx_owner(m) == curthread)
 #define mtx_name(m)             ((m)->mtx_lockobj.lo_name)
-
+/*
 #define mtx_init(c,name,opts)   _mtx_init((c),(name),(opts))
 #define mtx_destory(c)          _mtx_destory((c))
+#define _mtx_lock_falgs(m,opts,file,line)               \
+        __mtx_lock_flags(&(m)->mtx_lock,(opts),(file),(line))
+#define _mtx_unlock_flags(m,opts,file,line)             \
+        __mtx_unlock_flags(&(m)->mtx_lock,(opts),(file),(line))
 #define mtx_lock_flags_(m,opts,file,line)               \
         _mtx_lock_flags((m),(opts),(file),(line))
 #define mtx_unlock_flags_(m,opts,file,line)             \
@@ -24,5 +28,5 @@
 #define mtx_lock(m)              mtx_lock_flags((m),0)
 #define mtx_unlock(m)            mtx_unlock_flags((m),0)
 
-
+*/
 #endif

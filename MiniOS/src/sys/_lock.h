@@ -11,6 +11,9 @@
 #define LC_SLEEPLOCK            (0x00000002 << LO_CLASSSHIFT)
 #define LC_RECURSABLE           (0x00000004 << LO_CLASSSHIFT)
 
+#define LOCKING                 1
+#define LOCK_FREE               0
+
 struct lock_object {
     const char      *lo_name;
     int             lo_flags;
@@ -23,4 +26,10 @@ struct lock_class {
     void                (*lc_lock)(const struct lock_object *lock,int what);
     uintptr_t           (*lc_unlock)(const struct lock_object *lock,int how);
 };
+
+struct mtx {
+    struct lock_object      lock_object;
+    struct lock_class       lock_class;
+};
+
 #endif

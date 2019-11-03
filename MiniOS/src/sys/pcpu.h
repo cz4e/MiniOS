@@ -7,6 +7,7 @@
 #define PCPU_GET(cpuid)         (&(cpu[cpuid]))
 #define MAX_GROUPS              64
 #define PRIORITY_STEP           4
+#define MAX_CPU                 256
 
 struct pcpu {
     LIST_HEAD(,thread)  pcpu_runq[MAX_GROUPS - 1];

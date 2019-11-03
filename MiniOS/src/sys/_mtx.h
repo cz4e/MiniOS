@@ -10,8 +10,8 @@
 #define MTX_UNOWNED             0x00000020
 
 struct mtx {
-    struct lock_object      mtx_lockobj;
-    volatile uintptr_t      mtx_lock;
+    struct lock_object      lock_object;
+    struct lock_class       lock_class;
 };
 
 #endif

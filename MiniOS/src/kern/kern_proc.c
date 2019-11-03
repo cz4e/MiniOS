@@ -5,8 +5,15 @@
 #include <sys/bitstring.h>
 
 
-struct proc *curproc;
+
+#ifdef __SMP__
+struct proc *curproc[MAX_CPU];
+struct thread *curthread[MAX_CPU];
+#else
+struct proc *curproc[MAX_CPU];
 struct thread *curthread;
+#endif
+
 static struct proc *proc_idle;
 
 bitstr_t    bit_decl(proc_pidmap,PID_MAX);              /* Proc's pid bit map        */
