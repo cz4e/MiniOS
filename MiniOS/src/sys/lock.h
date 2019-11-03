@@ -4,8 +4,20 @@
 #include <sys/_lock.h>
 #include <sys/cdefs.h>
 
+#define spin_lock_init(lo, lc, n, d)                    \
+    _lock_init((lo),(lc),(n),LOCK_FREE)
+
+#define sleep_lock_init(lo, lc, n, d)                   \
+    _lock_init((lo),(lc),(n),LOCK_FREE)
+
+#define mtx_lock_init(lo, lc, n, d)                     \
+    _lock_init((lo),(lc),(n),(d))
+
+void _lock_init(struct lock_object *lo,
+                    struct lock_class *class, 
+                            const char *name, int data);
 void spin_lock(struct mtx *m);
-void spin_unloc(struct mtx *m);
+void spin_unlock(struct mtx *m);
 void sleep_lock(struct mtx *m);
 void sleep_unlock(struct mtx *m);
 void mtx_lock(struct mtx *m);

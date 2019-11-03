@@ -30,9 +30,24 @@ struct lock_class lock_class_mtx {
 };
 
 void 
-lock_init(struct lock_object *lo,struct lock_object *class,const char *name,int flags)
+_lock_init(struct lock_object *lo,struct lock_class *class, const char *name, int data)
 {
+
+    if (class == &lock_class_spin) {
+        lo->lo_flags |= LO_SPINLOCK;
+    } else if (class == &lock_class_sleep) {
+        lo->lo_flags |= LO_SLEEPLOCK;
+    } else {
+        lo->lo_flags |= LO_MTXLOCK;
+    }
     
+    for(int f = LC_RECURSABLE;f < LC_MAX;f <<= 1) {
+        if(class->lc_flags & f)
+            lo->lo_flags |= (f << LO_CLASSSHIFT);
+    }
+
+    lo->lo_name = name;
+    lo->lo_data = data;
 }
 
 void

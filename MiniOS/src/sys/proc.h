@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <sys/queue.h>
 #include <sys/signal.h>
-#include <sys/mtx.h>
+#include <sys/lock.h>
 #include <vm/vm.h>
 #include <sys/timevar.h>
 

@@ -10,7 +10,7 @@
 struct proc *curproc[MAX_CPU];
 struct thread *curthread[MAX_CPU];
 #else
-struct proc *curproc[MAX_CPU];
+struct proc *curproc;
 struct thread *curthread;
 #endif
 
@@ -147,7 +147,7 @@ proc_init(struct proc *p, struct thread *td, struct proc *parent,
     p->p_flags = flags;
     p->p_priority = pri == SET_DEFAULT ? DEFAULT_PRIORITY : pri;
     p->p_states |= PS_NEW;
-    p->p_mtx = MTX_INITIALIZER; //undefined
+    spin_lock_init(&p->p_mtx.lock_object,&p->p_mtx.lock_class,"structure proc spin lock",LOCK_FREE); 
     LIST_HEAD_INIT(p,p_childrens);
     proc_insert(p,cpuid);
 
@@ -164,9 +164,9 @@ thread_init(struct thread *td,struct proc *p, int pri, char *name)
     bzero(td,sizeof(struct thread));
     td->td_proc = p;
     td->td_state |= TDS_NEW;
-    td->td_mtx = MTX_INITIALIZER;   // undefined
+    spin_lock_init(&td->td_mtx.lock_object,&td->td_mtx.lock_class,"structure thread spin lock",LOCK_FREE);  
     td->td_sigmask  = 0;
-    td->td_tid = get_vaild_tid(p->p_pid);       // undefined
+    td->td_tid = get_vaild_tid(p->p_pid);
     td->td_factor = 128;    // undefined
     td->td_retcode = 0;
     td->td_priority = pri;
