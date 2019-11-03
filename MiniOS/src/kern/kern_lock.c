@@ -54,13 +54,13 @@ void
 spin_lock(struct mtx *m)
 {
     while(atomic_test_eq_int(m->lock_object.lo_data,LOCKING)) ;
-    atomic_set_int(m->lock_object.lo_data,LOCKING);
+    atomic_set_int(&m->lock_object.lo_data,LOCKING);
 }
 
 void
 spin_unlock(struct mtx *m)
 {
-    atomic_set_int(m->lock_object.lo_data,LOCK_FREE);
+    atomic_set_int(&m->lock_object.lo_data,LOCK_FREE);
 }
 
 void 
@@ -69,13 +69,13 @@ sleep_lock(struct mtx *m)
     while(atomic_test_eq_int(m->lock_object.lo_data,LOCKING)) 
         sched_sleep(curthread);
 
-    atomic_set_int(m->lock_object.lo_data,LOCKING);
+    atomic_set_int(&m->lock_object.lo_data,LOCKING);
 }
 
 void
 sleep_unlock(struct mtx *m)
 {
-    atomic_set_int(m->lock_object.lo_data,LOCK_FREE);
+    atomic_set_int(&m->lock_object.lo_data,LOCK_FREE);
 }
 
 void
