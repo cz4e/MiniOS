@@ -9,10 +9,15 @@
 #define PRIORITY_STEP           4
 #define MAX_CPU                 256
 
+struct thread;
+struct proc;
+
 struct pcpu {
     LIST_HEAD(,thread)  pcpu_runq[MAX_GROUPS - 1];
     LIST_HEAD(,thread)  pcpu_sleepq[MAX_GROUPS - 1];
     LIST_HEAD(,proc)    pcpu_list;
     struct thread *     pcpu_curthread;
+    struct proc *       pcpu_proc;
 };
+
 #endif

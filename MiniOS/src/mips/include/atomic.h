@@ -21,6 +21,19 @@ atomic_set_int32(volatile uint32_t *p,uint32_t v)
 static inline void
 atomic_clear_int32(volatile uint32_t *p,uint32_t v)
 {
+    uint32_t tmp;
+    v = ~v;
+
+    __asm__ volatile (
+        "1:\n\t"
+        "ll     %0, %3\n\t"
+        "and    %0, %2\n\t"
+        "sc     %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        : "=&r" (tmp), "=m" (*p)
+        : "r" (v), "m"(*p)
+        :"memory"
+    );
 
 }
 
@@ -202,43 +215,148 @@ atomic_clear_int64(volatile uint64_t *p, uint64_t v)
 static inline void
 atomic_add_int64(volatile uint64_t *p, uint64_t v)
 {
-
+    uint64_t tmp;
+    __asm__ volatile (
+        "1:\n\t"
+        "lld    %0, %3\n\t"
+        "daddu  %0, %2, %0\n\t"
+        "scd    %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        :"=&r" (tmp), "=m"(*p)
+        :"r" (v),"m" (*p)
+        :"memory"
+    );
 }
 
 static inline void
 atomic_sub_int64(volatile uint64_t *p, uint64_t v)
 {
-
+    uint64_t tmp;
+    __asm__ volatile (
+        "1:\n\t"
+        "lid    %0, %3\n\t"
+        "dsubu  %0, %2\n\t"
+        "scd    %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        :"=&r" (tmp), "=m" (*p)
+        :"r" (v), "m"(*p)
+        :"memory"
+    );
 }
 
 static inline uint64_t 
 atomic_test_eq_int64(uint64_t p, uint64_t v)
 {
+    uint64_t ret;
 
+    __asm__ volatile(
+        "1:\n\t"
+        "lid    %0, %3\n\t"
+        "beq    %0, %2, 2f\n\t"
+        "lid    %0, 0\n\t"
+        "scd    %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        "j  3f\n\t"
+        "2f:\n\t"
+        "lid    %0, 1\n\t"
+        "3:\n"
+        :"=&r" (ret), "=m"(p)
+        :"r"(v),"m"(p)
+    );
+
+    return (ret);
 }
 
 static inline uint64_t 
 atomic_test_ge_int64(uint64_t p, uint64_t v)
 {
+    uint64_t ret;
 
+    __asm__ volatile(
+        "1:\n\t"
+        "lid    %0, %3\n\t"
+        "bge    %0, %2, 2f\n\t"
+        "lid    %0, 0\n\t"
+        "scd    %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        "j  3f\n\t"
+        "2f:\n\t"
+        "lid    %0, 1\n\t"
+        "3:\n"
+        :"=&r" (ret), "=m"(p)
+        :"r"(v),"m"(p)
+    );
+
+    return (ret);
 }
 
 static inline uint64_t 
 atomic_test_gt_int64(uint64_t p, uint64_t v)
 {
+    uint64_t ret;
 
+    __asm__ volatile(
+        "1:\n\t"
+        "lid    %0, %3\n\t"
+        "bgt    %0, %2, 2f\n\t"
+        "lid    %0, 0\n\t"
+        "scd    %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        "j  3f\n\t"
+        "2f:\n\t"
+        "lid    %0, 1\n\t"
+        "3:\n"
+        :"=&r" (ret), "=m"(p)
+        :"r"(v),"m"(p)
+    );
+
+    return (ret);
 }
 
 static inline uint64_t 
 atomic_test_le_int64(uint64_t p, uint64_t v)
 {
+    uint64_t ret;
 
+    __asm__ volatile(
+        "1:\n\t"
+        "lid    %0, %3\n\t"
+        "ble    %0, %2, 2f\n\t"
+        "lid    %0, 0\n\t"
+        "scd    %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        "j  3f\n\t"
+        "2f:\n\t"
+        "lid    %0, 1\n\t"
+        "3:\n"
+        :"=&r" (ret), "=m"(p)
+        :"r"(v),"m"(p)
+    );
+
+    return (ret);
 }
 
 static inline uint64_t 
 atomic_test_lt_int64(uint64_t p, uint64_t v)
 {
+    uint64_t ret;
 
+    __asm__ volatile(
+        "1:\n\t"
+        "lid    %0, %3\n\t"
+        "blt    %0, %2, 2f\n\t"
+        "lid    %0, 0\n\t"
+        "scd    %0, %1\n\t"
+        "beqz   %0, 1b\n\t"
+        "j  3f\n\t"
+        "2f:\n\t"
+        "lid    %0, 1\n\t"
+        "3:\n"
+        :"=&r" (ret), "=m"(p)
+        :"r"(v),"m"(p)
+    );
+
+    return (ret);
 }
 
 #define atomic_set_int(p,v)                 \
@@ -267,5 +385,33 @@ atomic_test_lt_int64(uint64_t p, uint64_t v)
 
 #define atomic_test_le_int(p,v)             \
         atomic_test_le_int32((p),(v))
+
+#define atomic_set_long(p,v)                \
+        atomic_set_int64((p),(v))
+
+#define atomic_clear_long(p,v)              \
+        atomic_clear_int64((p),(v))
+
+#define atomic_add_long(p,v)                \
+        atomic_add_int64((p),(v))
+
+#define atomic_sub_long(p,v)                \
+        atomic_sub_int64((p),(v))
+
+#define atomic_test_eq_long(p,v)            \
+        atomic_test_eq_int64((p),(v))
+
+#define atomic_test_gt_long(p,v)            \
+        atomic_test_gt_int64((p),(v))
+
+#define atomic_test_ge_long(p,v)            \
+        atomic_test_ge_int64((p),(v))
+
+#define atomic_test_lt_long(p,v)            \
+        atomic_test_lt_int64((p),(v))
+
+#define atomic_test_le_long(p,v)            \
+        atomic_test_le_int64((p),(v))
+
 
 #endif

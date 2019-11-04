@@ -20,18 +20,18 @@
 #define LC_MAX                  LC_INITIALIZED
 
 #define LOCKING                 0x00000001
-
+#define LOCK_FREE               0x00000000
 struct lock_object {
     const char      *lo_name;
     int             lo_flags;
-    int             lo_data;
+    uint32_t        lo_data;
 };
 
 struct lock_class {
     const char *        lc_name;
     int                 lc_flags;
-    void                (*lc_lock)(const struct lock_object *lock,int what);
-    uintptr_t           (*lc_unlock)(const struct lock_object *lock,int how);
+    void                (*lc_lock)(const struct lock_object *lock);
+    uintptr_t           (*lc_unlock)(const struct lock_object *lock);
 };
 
 struct mtx {
