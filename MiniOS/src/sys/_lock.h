@@ -19,8 +19,7 @@
 #define LC_INITIALIZED          0x00000020
 #define LC_MAX                  LC_INITIALIZED
 
-#define LOCKING                 1
-#define LOCK_FREE               0
+#define LOCKING                 0x00000001
 
 struct lock_object {
     const char      *lo_name;

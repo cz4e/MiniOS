@@ -60,7 +60,7 @@ spin_lock(struct mtx *m)
 void
 spin_unlock(struct mtx *m)
 {
-    atomic_set_int(&m->lock_object.lo_data,LOCK_FREE);
+    atomic_clear_int(&m->lock_object.lo_data,LOCKING);
 }
 
 void 
@@ -75,7 +75,7 @@ sleep_lock(struct mtx *m)
 void
 sleep_unlock(struct mtx *m)
 {
-    atomic_set_int(&m->lock_object.lo_data,LOCK_FREE);
+    atomic_clear_int(&m->lock_object.lo_data,LOCKING);
 }
 
 void
