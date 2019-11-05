@@ -40,6 +40,7 @@ struct thread {
     LIST_ENTRY(thread)  td_sleepq;                  /* sleeping queue               */
     struct proc *       td_proc;                    /*                              */
     struct mtx          td_mtx;                     /* Mutual exclusion             */
+    uint64_t            td_flags;
     vm_addr_t           td_addr;                    /* Thread's base address        */
     size_t              td_size;                    /* The size of memory space     */
     tid_t               td_tid;                     /*                              */
@@ -48,12 +49,13 @@ struct thread {
     cpuid_t             td_cpuid;                   /* CPU which thread runs on     */
     SLIST_HEAD(,sigevent)   td_pendings;            /* signals pending queue        */
     sigmask_t           td_sigmask;                 /* signal mask                  */
-    struct timevar      td_sleeptime;               /* the time of sleeping queue   */
-    struct timevar      td_runtime;                 /* the running time             */
+    time_t              td_profclock;               /* the time of sleeping queue   */
+    time_t              td_virtualclock;            /* the running time             */
     int                 td_factor;                  /* for interactice process      */
     int                 td_retcode;                 /* return code                  */
     int                 td_priority;                /* Thread's priority            */
     int                 td_cpuid;                   /* cpu which thread run         */
+    volatile int        td_critnest;
     char                td_name[MAX_NAME - 1];      /* Thread's name                */
 };
 

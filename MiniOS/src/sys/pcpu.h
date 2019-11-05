@@ -17,7 +17,7 @@ struct pcpu {
     LIST_HEAD(,thread)  pcpu_sleepq[MAX_GROUPS - 1];
     LIST_HEAD(,proc)    pcpu_list;
     struct thread *     pcpu_curthread;
-    struct proc *       pcpu_proc;
+    struct proc *       pcpu_curproc;
 };
 
 #endif

@@ -13,6 +13,7 @@
 #define mtx_lock_init(lo, lc, n, d)                     \
     _lock_init((lo),(lc),(n),(d))
 
+
 void _lock_init(struct lock_object *lo,
                     struct lock_class *class, 
                             const char *name, int data);
@@ -23,4 +24,8 @@ void sleep_unlock(struct mtx *m);
 void mtx_lock(struct mtx *m);
 void mtx_unlock(struct mtx *m);
 
+#define thread_lock(m)                                  \
+    spin_lock((m))
+#define thread_unlock(m)                                \
+    spin_unlock((m))
 #endif

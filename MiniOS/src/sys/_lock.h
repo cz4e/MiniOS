@@ -21,6 +21,8 @@
 
 #define LOCKING                 0x00000001
 #define LOCK_FREE               0x00000000
+
+
 struct lock_object {
     const char      *lo_name;
     int             lo_flags;
