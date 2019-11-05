@@ -32,4 +32,5 @@ critical_exit(int cpuid)
     thread_unlock(&td->td_mtx);
 }
 
+
 #endif

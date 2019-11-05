@@ -1,60 +1,43 @@
+#include <sys/cdefs.h>
 #include <sys/clock.h>
 #include <sys/proc.h>
 #include <include/bzero.h>
 #include <sys/pcpu.h>
 #include <sys/lock.h>
+#include <sys/system.h>
+#include <sys/tslog.h>
 
-#define MAX_TIMERS      3
-time_t timer_pool[MAX_TIMERS];
-time_t ticks;
-
-typedef void (*clock_hook_t)(void);
-static clock_hook_t clock_hook;
-
+uint64_t counter_freq;
+static uint64_t cycles_per_usec;
 
 void
-clock_default_hook(void)
+mips_timer_early_init(uint64_t clock_hz)
 {
-
+    counter_freq = clock_hz;
+    cycles_per_usec = (clock_hz / (1000 * 1000));
 }
 
 void
-clock_init(void)
+mips_delay(int ms)
 {
-    ticks = 0;
-    bzero(timer_pool,MAX_TIMERS * sizeof(time_t));
-    clock_hook = clock_default_hook();
-    machine_isr_set(ISR_CLOCK,clock_handle);
-}
+    uint32_t cur, last, delta, usecs;
 
-static void
-clock_handle(int cpuid)
-{
-    struct thread *td = PCPU_GET(cpuid)->pcpu_curthread;
-    
-    thread_lock(&td->td_mtx);
-    td->td_profclock--;         /* run on cpu   */
-    td->td_virtualclock++;      /* all time     */
+    TSENTER();
+    last = mips_rd_count();
+    delta = usecs = 0;
 
-    proc_ticks();
-    clock_hook();
-    timer_handle();
+    while(ms > usecs) {
+        cur = mips_rd_count();
+        if(cur < last)
+            delta += cur + (0xffffffff - last) + 1;
+        else
+            delta += cur - last;
+        last = cur;
 
-    if(td->td_profclock < 1) {
-        td->td_flags |= TDS_RESCHUDLE;
+        if(delta >= cycles_per_usec) {
+            usecs += delta / cycles_per_usec;
+            delta %= cycles_per_usec;
+        }
     }
-    thread_unlcok(&td->td_mtx);
-}
-
-
-clock_hook_t
-clock_gethook(void)
-{
-    return (clock_hook);
-}
-
-time_t
-clock_getticks(void)
-{
-    
+    TSEXIT();
 }

@@ -14,5 +14,6 @@
     __DEQUALIFY(s *,(const volatile char *)x - __offsetof(s,m));
 //    const volatile __typeof(((s *)0)->m) *__x = (x);                        
 
-
+#define __STRING(s)                    #s
+#define __XSTRING(s)                    __STRING(s)
 #endif
