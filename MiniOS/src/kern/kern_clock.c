@@ -3,7 +3,6 @@
 #include <sys/proc.h>
 #include <include/bzero.h>
 #include <sys/pcpu.h>
-#include <sys/lock.h>
 #include <sys/system.h>
 #include <sys/tslog.h>
 
@@ -40,4 +39,14 @@ mips_delay(int ms)
         }
     }
     TSEXIT();
+}
+
+void 
+mips_timer_init_params(uint64_t platfrom_counter_freq, int double_count)
+{
+    counter_freq = platfrom_counter_freq;
+    if(double_count != 0)
+        counter_freq /= 2;
+    cycles_per_usec = counter_freq / (1000 * 1000);
+    set_cputicker(tick_ticker, counter_freq, 1);
 }
