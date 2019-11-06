@@ -1,5 +1,5 @@
 #ifndef _MIPS_CPUREGS_H_
-#define _MISP_CPUREGS_H_
+#define _MIPS_CPUREGS_H_
 
 
 #define MIPS_COP_0_SR               _(12)
@@ -15,7 +15,7 @@
 #define MIPS_COP_0_TLB_ENTRYLO0     _(2)
 #define MIPS_COP_0_TLB_ENTRYLO0_SELECT _(0)
 #define MIPS_COP_0_TLB_ENTRYLO1     _(3)
-#define MIPS_COP_0_TLB_ENTRYLO1_SELECT _(1_)
+#define MIPS_COP_0_TLB_ENTRYLO1_SELECT _(1)
 #define MIPS_COP_0_TLB_ENTRYHI      _(10)
 #define MIPS_COP_0_TLB_INDEX        _(0)
 #define MIPS_COP_0_TLB_PAGEMASK     _(5)
