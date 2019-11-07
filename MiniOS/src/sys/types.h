@@ -21,8 +21,9 @@ typedef __sigmask_t             sigmask_t;
 
 typedef __vm_addr_t             vm_addr_t;
 typedef __vm_offset_t           vm_offset_t;
+typedef vm_addr_t               vm_size_t;
 typedef __size_t                size_t;
-
+typedef uint64_t                vm_flags_t;
 typedef __time_t                time_t;
 typedef __utime_t               utime_t;
 

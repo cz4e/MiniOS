@@ -4,10 +4,10 @@
 #include <sys/_lock.h>
 #include <sys/cdefs.h>
 
-#define spin_lock_init(lo, lc, n, d)                    \
+#define spin_lock_init(lo, lc, n)                       \
     _lock_init((lo),(lc),(n),LOCK_FREE)
 
-#define sleep_lock_init(lo, lc, n, d)                   \
+#define sleep_lock_init(lo, lc, n)                      \
     _lock_init((lo),(lc),(n),LOCK_FREE)
 
 #define mtx_lock_init(lo, lc, n, d)                     \
@@ -27,5 +27,10 @@ void mtx_unlock(struct mtx *m);
 #define thread_lock(m)                                  \
     spin_lock((m))
 #define thread_unlock(m)                                \
+    spin_unlock((m))
+
+#define map_lock(m)                                     \
+    spin_lock((m))
+#define map_unlock(m)                                   \
     spin_unlock((m))
 #endif
