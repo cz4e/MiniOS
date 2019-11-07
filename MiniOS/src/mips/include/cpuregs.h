@@ -45,9 +45,9 @@
 #define MIPS_COP_0_ERROREPC         _(30)
 
 #define MIPS_COP_0_TAGLO            _(28)
-#define MIPS_COP_0_TAGLO0_SELECT    _(0)
+#define MIPS_COP_0_TAGLO_SELECT     _(0)
 #define MIPS_COP_0_DATALO           _(28)
-#define MIPS_COP_0_DATALO1_SELECT   _(1)
+#define MIPS_COP_0_DATALO_SELECT    _(1)
 #define MIPS_COP_0_TAGHI            _(29)
 #define MIPS_COP_0_TAGHI_SELECT     _(0)
 #define MIPS_COP_0_DATAHI           _(29)
