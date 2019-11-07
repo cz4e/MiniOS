@@ -1,7 +1,5 @@
 #include <vm/vm.h>
 
-typedef struct vm_map *vm_map_t;
-
 vm_offset_t
 kmap_alloc(vm_map_t map, size_t size)
 {
@@ -22,6 +20,16 @@ kmap_alloc(vm_map_t map, size_t size)
         }
 #endif
     }   
-    vm_map_insert();
+    vm_map_insert(map, NULL, 0, addr, addr + size);
     vm_map_unlock(&map->vmm_lock); 
+
+    return (addr);
+}
+
+void
+kmap_free(vm_map_t map, vm_addr_t start, vm_offset_t offset)
+{
+    vm_map_lock(&map->vmm_lock);
+    vm_map_delete(map, trunc_page(addr), (addr + size) % PAGE_SIZE);
+    vm_map_unlock(&map->vmm_lock);
 }

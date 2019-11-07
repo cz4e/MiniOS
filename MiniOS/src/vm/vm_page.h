@@ -15,4 +15,6 @@ struct vm_page{
     char                    vmp_dirty;
 };
 
+typedef struct vm_page *vm_page_t;
+
 #endif

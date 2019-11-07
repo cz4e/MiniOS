@@ -14,4 +14,6 @@ struct vm_object {
     volatile int          vmo_busy;
 };
 
+typedef struct vm_object *vm_object_t;
+
 #endif

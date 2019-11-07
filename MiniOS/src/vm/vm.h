@@ -45,5 +45,10 @@ struct vm_map_entry {
     vm_map_object_t     vme_object;
 };
 
+typedef struct vm_map *vm_map_t;
+typedef struct vm_map_entry vm_map_entry_t;
+typedef struct vmspace *vmspace_t;
 
+vm_addr_t  vm_map_insert(vm_map_t ,vm_object_t,vm_offset_t, vm_addr_t, vm_offset_t);
+void vm_map_delete(vm_map_t ,vm_addr_t, vm_offset_t );
 #endif
