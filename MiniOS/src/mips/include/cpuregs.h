@@ -91,4 +91,95 @@
 #endif
 
 
+/* Status register flags */
+#define SR_IE_OFFSET                0
+#define SR_EXL_OFFSET               1
+#define SR_ERL_OFFSET               2
+#define SR_KSU_OFFSET               3
+#define SR_UX_OFFSET                5
+#define SR_SX_OFFSET                6
+#define SR_KX_OFFSET                7
+#define SR_IM_OFFSET                8
+#define SR_IPL_OFFSET               10
+#define SR_NMI_OFFSET               19
+#define SR_SR_OFFSET                20
+#define SR_TS_OFFSET                21
+#define SR_BEV_OFFSET               22
+#define SR_PX_OFFSET                23
+#define SR_MX_OFFSET                24
+#define SR_RE_OFFSET                25
+#define SR_FR_OFFSET                26
+#define SR_RP_OFFSET                27
+#define SR_CU_OFFSET                28
+
+#define MIPS_SR_IE                  (0x1 << SR_IE_OFFSET)
+#define MIPS_SR_EXL                 (0x1 << SR_EXL_OFFSET)
+#define MIPS_SR_ERL                 (0x1 << SR_ERL_OFFSET)
+#define MIPS_SR_KSU                 (0x3 << SR_KSU_OFFSET)
+#define MIPS_SR_UX                  (0x1 << SR_UX_OFFSET)
+#define MIPS_SR_SX                  (0x1 << SR_SX_OFFSET)
+#define MIPS_SR_KX                  (0x1 << SR_KX_OFFSET)
+#define MIPS_SR_IM                  (0x3 << SR_IM_OFFSET)
+#define MIPS_SR_IPL                 (0x3f << SR_IPL_OFFSET)
+#define MIPS_SR_NMI                 (0x1 << SR_NMI_OFFSET)
+#define MIPS_SR_SR                  (0x1 << SR_SR_OFFSET)
+#define MIPS_SR_TS                  (0x1 << SR_TS_OFFSET)
+#define MIPS_SR_BEV                 (0x1 << SR_BEV_OFFSET)
+#define MIPS_SR_PX                  (0x1 << SR_PX_OFFSET)
+#define MIPS_SR_MX                  (0x1 << SR_MX_OFFSET)
+#define MIPS_SR_RE                  (0x1 << SR_RE_OFFSET)
+#define MIPS_SR_FR                  (0x1 << SR_FR_OFFSET)
+#define MIPS_SR_RP                  (0x1 << SR_RP_OFFSET)
+#define MIPS_SR_CU                  (0xf << SR_CU_OFFSET)
+
+
+#define CAUSE_EXCCODE_OFFSET        2
+#define CAUSE_IP_FIELD0_OFFSET      8
+#define CAUSE_IP_FIELD1_OFFSET      10
+#define CAUSE_RIPL_OFFSET           CAUSE_IP_FIELD1_OFFSET
+#define CAUSE_WP_OFFSET             22
+#define CAUSE_IV_OFFSET             23
+#define CAUSE_PCI_OFFSET            26
+#define CAUSE_DC_OFFSET             27
+#define CAUSE_CE_OFFSET             28
+#define CAUSE_TI_OFFSET             30
+#define CAUSE_BD_OFFSET             31
+
+#define MIPS_CAUSE_EXECCODE         (0x1 << CAUSE_EXCCODE_OFFSET)
+#define MIPS_CAUSE_IP_FIELD0        (0x3 << CAUSE_IP_FIELD0_OFFSET)
+#define MIPS_CAUSE_IP_FILED1        (0x3f << CAUSE_IP_FIELD1_OFFSET)
+#define MIPS_CAUSE_RIPL             (0x3f << CAUSE_RIPL_OFFSET)
+#define MIPS_CAUSE_WP               (0x1 << CAUSE_WP_OFFSET)
+#define MIPS_CAUSE_IV               (0x1 << CAUSE_IV_OFFSET)
+#define MIPS_CAUSE_PCI              (0x1 << CAUSE_PCI_OFFSET)
+#define MIPS_CAUSE_DC               (0x1 << CAUSE_DC_OFFSET)
+#define MIPS_CAUSE_CE               (0x3 << CAUSE_CE_OFFSET)
+#define MIPS_CAUSE_TI               (0x1 << CAUSE_TI_OFFSET)
+#define MIPS_CAUSE_BD               (0x1 << CAUSE_BD_OFFSET)
+
+#define CAUSE_EXECCODE_INT                0
+#define CAUSE_EXECCODE_MOD                1
+#define CAUSE_EXECCODE_TLBL               2
+#define CAUSE_EXECCODE_TLBS               3
+#define CAUSE_EXECCODE_ADEL               4
+#define CAUSE_EXECCODE_ADES               5
+#define CAUSE_EXECCODE_IBE                6
+#define CAUSE_EXECCODE_DBE                7
+#define CAUSE_EXECCODE_SYSCALL            8
+#define CAUSE_EXECCODE_BP                 9
+#define CAUSE_EXECCODE_RI                 10
+#define CAUSE_EXECCODE_CPU                11
+#define CAUSE_EXECCODE_OV                 12
+#define CAUSE_EXECCODE_TRAP               13
+#define CAUSE_EXECCODE_UNUSED             14
+#define CAUSE_EXECCODE_FPE                15
+#define CAUSE_EXECCODE_C2E                18
+#define CAUSE_EXECCODE_MDMX               22
+#define CAUSE_EXECCODE_WATCH              23
+#define CAUSE_EXECCODE_MCHECK             24
+#define CAUSE_EXECCODE_THREAD             25
+#define CAUSE_EXECCODE_DSP                26
+#define CAUSE_EXECCODE_CACHEERR           30
+
+
 #endif

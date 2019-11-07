@@ -179,9 +179,9 @@ intr_disable(void)
     register_t status;
     status = mips_read_sr();
 
-    mips_write_sr(status & ~MIPS_INTR_IE);
+    mips_write_sr(status & ~MIPS_SR_IE);
 
-    return (status & MIPS_INTR_IE);
+    return (status & MIPS_SR_IE);
 }
 
 static inline register_t 
@@ -189,9 +189,16 @@ intr_enable(void)
 {
     register_t status;
     status = mips_read_sr();
-    mips_write_sr(status | MIPS_INTR_IE);
+    mips_write_sr(status | MIPS_SR_IE);
 
     return (status);
+}
+
+static inline void
+intr_restore(register_t ie)
+{
+    if(ie & MIPS_SR_IE)
+        intr_enable();
 }
 
 #endif
