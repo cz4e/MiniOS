@@ -33,4 +33,10 @@ void mtx_unlock(struct mtx *m);
     spin_lock((m))
 #define map_unlock(m)                                   \
     spin_unlock((m))
+
+#define vm_map_lock(m)                                  \
+    spin_lock((m))
+#define vm_map_unlock(m)                                \
+    spin_unlock((m))
+
 #endif

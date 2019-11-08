@@ -1,4 +1,5 @@
-#include <vm/vm.h>
+#include <sys/vmem.h>
+
 
 vm_offset_t
 kmap_alloc(vm_map_t map, size_t size)
@@ -30,6 +31,7 @@ void
 kmap_free(vm_map_t map, vm_addr_t start, vm_offset_t offset)
 {
     vm_map_lock(&map->vmm_lock);
-    vm_map_delete(map, trunc_page(addr), (addr + size) % PAGE_SIZE);
+    vm_map_delete(map, trunc_page(start), (start + offset) % PAGE_SIZE);
     vm_map_unlock(&map->vmm_lock);
 }
+

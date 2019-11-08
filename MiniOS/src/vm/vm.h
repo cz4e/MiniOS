@@ -2,10 +2,16 @@
 #define _VM_VM_H_
 #include <vm/vm_object.h>
 #include <mips/vm/vm.h>
+#include <sys/lock.h>
 
 struct vm_map;
 struct vm_map_entry;
 struct vm_object;
+struct vmspace;
+
+typedef struct vm_map *vm_map_t;
+typedef struct vm_map_entry vm_map_entry_t;
+typedef struct vmspace *vmspace_t;
 
 struct vmspace {
     struct mtx          vms_lock;
@@ -21,7 +27,7 @@ struct vmspace {
 };
 
 struct vm_map {
-    LIST_HEAD(,vm_map_entry)    vmm_header;
+    struct vm_map_entry         vmm_header;
     struct mtx                  vmm_lock;
     vm_size_t                   vmm_size;
     uint32_t                    vmm_timestamp;
@@ -45,10 +51,11 @@ struct vm_map_entry {
     vm_map_object_t     vme_object;
 };
 
-typedef struct vm_map *vm_map_t;
-typedef struct vm_map_entry vm_map_entry_t;
-typedef struct vmspace *vmspace_t;
+
 
 vm_addr_t  vm_map_insert(vm_map_t ,vm_object_t,vm_offset_t, vm_addr_t, vm_offset_t);
 void vm_map_delete(vm_map_t ,vm_addr_t, vm_offset_t );
+
+#define KMEM_INVAILD_ADDRESS            -1
+
 #endif
