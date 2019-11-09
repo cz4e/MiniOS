@@ -110,4 +110,20 @@ struct {                                                \
                 break;                                  \
             }                                           \
         }
+
+#define LIST_SEARCH_FORWORD(cur,pin,relate)             \
+        for((cur) = (pin);                              \
+        (cur) && (relate);                              \
+        (cur) = LIST_PREV((cur)))                       
+
+#define LIST_SEARCH_BACK(cur,pin,relate)                \
+        for((cur) = (pin);                              \
+        (cur) && (relate);                              \
+        (cur) = LIST_NEXT((cur)))
+
+#define LIST_SEARCH(cur,head,field,relate)              \
+        for((cur) = LIST_FIRST((head));                 \
+        (cur) && (relate);                              \
+        ;(cur) = LIST_NEXT((cur),field))
+
 #endif
