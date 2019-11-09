@@ -28,6 +28,6 @@ typedef __time_t                time_t;
 typedef __utime_t               utime_t;
 
 typedef __uintptr_t             uintptr_t;
-
+typedef uint32_t                index_t;
 typedef uint64_t                objtype_t;
 #endif
