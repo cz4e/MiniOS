@@ -7,6 +7,7 @@ struct vmspace {
     vm_addr_t                   vm_start;
     vm_size_t                   vm_present_size;
     vm_size_t                   vm_initial_size;
+    char                        vm_used;                /* for find_a_vaild_vmspace */
 };
 
 typedef struct vmspace *       vmspace_t;
