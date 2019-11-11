@@ -3,6 +3,7 @@
 
 struct vmspace {
     LIST_ENTRY(vmspace)         vm_entry;
+    LIST_ENTRY(vmspace)         vm_buddy;
     node_t                      vm_owner;
     vm_addr_t                   vm_start;
     vm_size_t                   vm_present_size;
