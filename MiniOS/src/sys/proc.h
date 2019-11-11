@@ -5,7 +5,7 @@
 #include <sys/queue.h>
 #include <sys/signal.h>
 #include <sys/lock.h>
-#include <vm/vm.h>
+#include <vm/vm_FSMM.h>
 #include <sys/timevar.h>
 
 
