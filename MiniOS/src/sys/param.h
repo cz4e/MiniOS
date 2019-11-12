@@ -40,4 +40,16 @@ round_base2(uint64_t n)
     return (f == 1 ? 2 : f);
 }
 
+static int 
+get_order_base2(uint64_t n)
+{
+    uint64_t f = round_base2(n);
+    int order = 0;
+    while(f != 1) {
+        f /= 2;
+        order++;
+    }
+
+    return (order);
+}
 #endif

@@ -75,6 +75,7 @@ struct {                                                \
                                                             LIST_PREV((elm),field) = LIST_PREV((obj),field);        \
                                                             LIST_NEXT(*(LIST_PREV((obj),field))) = (elm);           \
                                                             LIST_NEXT((elm),field) = (obj);                         \
+                                                            LIST_PREV((obj),field) = &(elm);                        \
                                                         }while(0)
 
 #define LIST_REMOVE_HEAD(head,elm,field)                do{\
