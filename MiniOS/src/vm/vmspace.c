@@ -4,10 +4,18 @@
 #include <vm/node.h>
 #include <vm/vmspace.h>
 #include <sys/lock.h>
+#include <bzero.h>
 
 static struct vmspace vmspace_pool[MAX_VMSPACE_POOL];
 static struct mtx vmspace_lock;
+extern struct lock_class lock_class_spin;
 
+void
+vmspace_startup(void)
+{
+    bzero(vmspace_pool,sizeof(struct vmspace) * MAX_VMSPACE_POOL);
+    spin_lock_init(&vmspace_lock.lock_object,&lock_class_spin,"VMSPACE LOCK");
+}
 
 vmspace_t
 vmspace_alloc(zone_t zone, vm_size_t size)
@@ -43,6 +51,11 @@ find_a_vaild_vmspace(void)
     return (res);
 }
 
+static void
+free_a_vmspace(vmspace_t nouesd)
+{
+    bzero(nouesd,sizeof(struct vmspace));
+}
 
 static vmspace_t
 _vmspace_alloc(zone_t zone, int order, vm_size_t size)
@@ -117,8 +130,6 @@ vmspace_node_select_and_divide(zone_t zone, node_t node,int  order, vm_size_t si
     Start allocation
 */
     res = find_a_vaild_vmspace(); /* get a vaild structure from pool */
-    LIST_NEXT(res,vm_entry) = LIST_PREV(res,vm_entry) = NULL;
-
     source_space = LIST_FIRST(&node->node_vmspace);
     LIST_REMOVE_HEAD(&node->node_vmspace,source_space,vm_entry);
     node->node_nr_nodes--;
@@ -146,6 +157,7 @@ vmspace_node_select_and_divide(zone_t zone, node_t node,int  order, vm_size_t si
     if(is_round_base2(reserve_pages)) {
         reserve_pages = round_base2(reserve_pages);
         LIST_INSERT_HEAD(&zone->zone_nodes[reserve_pages]->node_vmspace,source_space,vm_entry);
+        zone->zone_nodes[reserve_pages]->node_nr_nodes++;
         goto success;
     }
 
@@ -196,61 +208,58 @@ vmspace_divide(zone_t zone, vmspace_t source_space, int reserve_pages)
     return ;
 }
 
-static uint64_t
+static vmspace_t
 vmspace_combined(vmspace_t vmspace,vmspace_t buddy)
 {
-    uint64_t size;
+    LIST_NEXT(vmspace,vm_buddy) = LIST_NEXT(buddy,vm_buddy);
 
+    if(LIST_PREV(buddy,vm_buddy) && (*LIST_PREV(buddy,vm_buddy))) {
+        LIST_PREV(&LIST_NEXT(buddy,vm_buddy),vm_buddy) = &vmspace;
+    } 
 
-    return (size);
+    vmspace->vm_present_size += buddy->vm_present_size;
+    free_a_noused_vmspace(buddy);
+    return (vmspace);
 }
 
-static void
-vmspace_merge(zone_t zone, vmspace_t vmspace, uint64_t vmspace_counter)
-{
-    uint64_t size;
-
-    for(;vmspace_counter;--vmspace_counter) {
-        size = vmspace_combined(vmspace,LIST_NEXT(vmspace,vm_buddy));
-    }
-
-
-}
 
 void
 vmspace_free(zone_t zone, vmspace_t vmspace)
 {
-    uint64_t size = vmspace->vm_present_size;
-    uint64_t reserve_pages = size / PAGE_SIZE;
-    uint64_t total = size;
-    int order, vmspace_counter = 0;
-    vmspace_t vm;
 
-    vmspace->vm_used = 0;
+    vmspace->vm_refcount--;
 
-    if(LIST_NEXT(vmspace,vm_buddy) == NULL || LIST_NEXT(vmspace,vm_buddy)->vm_used) {
-        if(is_round_base2(size)) {
-            order = get_order_base2(size);
-            zone->zone_nodes[order]->node_nr_nodes++;
-            LIST_INSERT_HEAD(&zone->zone_nodes[order]->node_vmspace,vmspace,vm_entry);
-            goto _free_done;
-        } else {
-            vmspace_divide(zone,vmspace,reserve_pages);
-            goto _free_done;
-        }
-    } else {
-        vm = vmspace;
-        while(LIST_NEXT(vm, vm_buddy) && !LIST_NEXT(vm,vm_buddy)->vm_used) {
-            total += vm->vm_present_size;
-            if(is_round_base2(total)) {
-               vmspace_merge(zone, vmspace, vmspace_counter);
-            } 
-            vm = LIST_NEXT(vm,vm_buddy);
-        }
-    }
-
-_free_done:
-
+    if(vmspace->vm_refcount == 0) {
+        _vmspace_free(zone,vmspace);
+    } else if(vmspace->vm_refcount < 0) {
+        panic("vmspace_free: vmspace has been freed already");
+    } 
     return ;
 }
 
+static void
+_vmspace_free(zone_t zone, vmspace_t vmspace)
+{
+    uint64_t size = vmspace->vm_present_size;
+    vmspace_t vm = vmspace;
+    uint64_t pages;
+
+    while(LIST_NEXT(vm,vm_buddy) && !LIST_NEXT(vm,vm_buddy)->vm_used) {
+        size += LIST_NEXT(vm,vm_buddy)->vm_present_size;
+        vm = vmspace_combined(vm,LIST_NEXT(vm,vm_buddy));
+    }
+
+    while(LIST_PREV(vm,vm_buddy) && *LIST_PREV(vm,vm_buddy) && !(*LIST_PREV(vm,vm_buddy))->vm_used) {
+        size += (*LIST_PREV(vm,vm_buddy))->vm_present_size;
+        vm = vmspace_combined(*LIST_PREV(vm,vm_buddy),vm);
+    }
+
+    if(is_round_base2(size)) {
+        size = get_order_base2(size);
+        LIST_INSERT_HEAD(&zone->zone_nodes[size]->node_vmspace,vm,vm_entry);
+    } else {
+        pages = size / PAGE_SIZE;
+        vmspace_divide(zone,vm,pages);
+    }
+    return ;
+}
