@@ -1,6 +1,8 @@
 #ifndef _VM_ZONE_H_
 #define _VM_ZONE_H_
 
+#include <mips/vm/zone.h>
+
 #define MAX_ORDER           11
 
 #define ZONE_DMA            0
@@ -10,7 +12,12 @@
 #define ZONE_MOVABLE        5
 #define MAX_ZONE_NR         (ZONE_MOVABLE + 1)
 
-#include <mips/vm/zone.h>
+
+
+#define ZONE_LOCK(lock)                     \
+    spin_lock((lock))
+#define ZONE_UNLOCK(lock)                   \
+    spin_unlock((lock))
 
 struct node;
 struct zone{

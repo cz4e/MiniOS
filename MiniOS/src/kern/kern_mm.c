@@ -29,7 +29,7 @@ kmalloc(int zone,vm_size_t size, int flags)
 /*
     If you want to use this function,  get vmq lock first
 */
-static vmspace_t
+vmspace_t
 addr2vmspace(void *where)
 {
     caddr_t addr = (caddr_t) where;
@@ -44,6 +44,8 @@ addr2vmspace(void *where)
 
     return (vm);
 }
+
+
 
 
 void
@@ -67,4 +69,16 @@ kmfree(void * where)
     vmspace_free(vm);
 
     return ;    
+}
+
+vmspace_t
+kmalloc_vmspace(int zone, vm_size_t size, int flags)
+{
+    vmspace_t newspace;
+
+    newspace = vmspace_alloc(zone,size);
+    VMQ_LOCK(&vmq_lock);
+    LIST_INSERT_HEAD(&vmq,newspace,vm_vmq);
+    VMQ_UNLOCK(&vmq_lock);
+    return (newspace);
 }

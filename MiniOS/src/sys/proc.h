@@ -5,7 +5,7 @@
 #include <sys/queue.h>
 #include <sys/signal.h>
 #include <sys/lock.h>
-#include <vm/vm_FSMM.h>
+#include <vm/vm.h>
 #include <sys/timevar.h>
 
 
@@ -76,7 +76,7 @@ struct proc {
     flag_t              p_flags;                    /* Proc's flags                 */
     int                 p_priority;                 /* Proc's priority              */
     int                 p_states;                   /* Proc's states                */
-    struct vmspace      p_vmspace;                  /* Proc's memeory space         */    
+    struct mmspace      p_vmspace;                  /* Proc's memeory space         */    
     char                p_name[MAX_NAME - 1];       /* Proc's name                  */
 };
 

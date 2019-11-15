@@ -2,7 +2,7 @@
 #define _VM_VM_H_
 
 struct mmspace {
-    vmspace_t       mms_vmspace;
+    caddr_t         mms_start;
     segsz_t         mms_swrss;
     segsz_t         mms_tsize;
     segsz_t         mms_dsize;
@@ -10,6 +10,7 @@ struct mmspace {
     caddr_t         mms_taddr;
     caddr_t         mms_daddr;
     caddr_t         mms_maxsaddr;
+    vm_size_t       mms_size;
 };
 
 #endif

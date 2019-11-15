@@ -12,12 +12,16 @@
 struct thread;
 struct proc;
 
+
 struct pcpu {
     LIST_HEAD(,thread)  pcpu_runq[MAX_GROUPS - 1];
     LIST_HEAD(,thread)  pcpu_sleepq[MAX_GROUPS - 1];
     LIST_HEAD(,proc)    pcpu_list;
     struct thread *     pcpu_curthread;
     struct proc *       pcpu_curproc;
+    uint32_t            pcpu_cpuid;
 };
+
+#define CURPCPU_GET(element)       (curpcpu->pcpu_##element)
 
 #endif

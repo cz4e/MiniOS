@@ -43,7 +43,7 @@ round_base2(uint64_t n)
 static int 
 get_order_base2(uint64_t n)
 {
-    uint64_t f = round_base2(n);
+    uint64_t f = n;
     int order = 0;
     while(f != 1) {
         f /= 2;

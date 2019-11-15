@@ -136,7 +136,7 @@ proc_insert(struct proc *p,int cpuid)
 
 void 
 proc_init(struct proc *p, struct thread *td, struct proc *parent,
-             pid_t ppid, flag_t flags, int pri,int cpuid,char *name)
+             pid_t ppid, flag_t flags, int pri,int cpuid,const char *name)
 {
     long i;
     bzero(p,sizeof(struct proc));
@@ -158,7 +158,7 @@ proc_init(struct proc *p, struct thread *td, struct proc *parent,
 }
 
 void 
-thread_init(struct thread *td,struct proc *p, int pri, char *name)
+thread_init(struct thread *td,struct proc *p, int pri, const char *name)
 {
     long i;
     bzero(td,sizeof(struct thread));
@@ -174,6 +174,7 @@ thread_init(struct thread *td,struct proc *p, int pri, char *name)
     LIST_ENTRY_INIT(td,td_sleepq);
     SLIST_HEAD_INIT(td,td_pendings);
     pcb_init(); // undefined
+
     for(i = 0;i<MAX_NAME && name[i];i++) {
         td->td_name[i] = name[i];
     }
@@ -223,9 +224,9 @@ proc_exit(struct proc *p)
         
         ret = thread_exit(td);
     }
-    // release resources
-    // disconnect from a list
-    // free structures
+    kmfree(p->p_vmspace.mms_start);
+    kmfree(td);
+    kmfree(p);
     return (ret);
 }
 
@@ -254,14 +255,12 @@ thread_exit(struct thread *td)
             }
         }
     }
-    // release thread's resouces
-    // free thread's structure
 }
 
 int
 proc_kill(pid_t pid)
 {
-    int ret;
+    int ret = 1;
     struct proc *p,**procp;
     if(curproc->p_pid == pid) {
         ret = proc_exit(curproc);
@@ -276,12 +275,13 @@ proc_kill(pid_t pid)
         }
     }
 
-    for(procp = &curproc;*procp;procp = LIST_PREV(p,p_list)) {
+    for(procp = &curproc;procp && *procp;procp = LIST_PREV(p,p_list)) {
         if((*procp)->p_pid == pid) {
             ret = proc_exit(*procp);
             return (ret);
         }
     }
 
+    return (ret);
 }
 

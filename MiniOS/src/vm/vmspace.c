@@ -6,9 +6,22 @@
 #include <sys/lock.h>
 #include <bzero.h>
 
+
 static struct vmspace vmspace_pool[MAX_VMSPACE_POOL];
 static struct mtx vmspace_lock;
 extern struct lock_class lock_class_spin;
+extern struct zone zones[MAX_ZONETYPES];
+
+static vmspace_t find_a_vaild_vmspace(void);
+static void free_a_vmspace(vmspace_t);
+static vmspace_t _vmspace_alloc(zone_t,int, vm_size_t);
+static vmspace_t _vmspace_alloc_wait(zone_t,int ,vm_size_t);
+static vmspace_t vmspace_node_select_and_divide(zone_t,node_t,int,vm_size_t);
+static void vmspace_divide(zone_t,vmspace_t, int);
+static vmspace_t vmspace_combined(vmspace_t ,vmspace_t);
+static void _vmspace_free(zone_t, vmspace_t );
+
+
 
 void
 vmspace_startup(void)
@@ -18,11 +31,13 @@ vmspace_startup(void)
 }
 
 vmspace_t
-vmspace_alloc(zone_t zone, vm_size_t size)
+vmspace_alloc(int zone_type, vm_size_t size)
 {
     vmspace_t res;
     int order;
 
+    zone_t zone = &zones[zone_type];
+    size = round_base2(size);
     order = get_order_base2(size);
     ZONE_LOCK(&zone->zone_lock);
     res = _vmspace_alloc(zone,order, size);
@@ -83,7 +98,7 @@ _vmspace_alloc(zone_t zone, int order, vm_size_t size)
     return (res);
 }
 
-vmspace_t 
+static vmspace_t 
 _vmspace_alloc_wait(zone_t zone, int order, vm_size_t size)
 {
     node_t present_node;
@@ -224,11 +239,11 @@ vmspace_combined(vmspace_t vmspace,vmspace_t buddy)
 
 
 void
-vmspace_free(zone_t zone, vmspace_t vmspace)
+vmspace_free(vmspace_t vmspace)
 {
 
     vmspace->vm_refcount--;
-
+    zone_t zone = vmspace->vm_zone;
     if(vmspace->vm_refcount == 0) {
         _vmspace_free(zone,vmspace);
     } else if(vmspace->vm_refcount < 0) {
