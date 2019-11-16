@@ -4,7 +4,7 @@
 
 struct thread *curthread;
 struct pcpu *curpcpu;
-struct pcpu cpu_pcpu[MAX_CPU];
+extern struct pcpu cpu_pcpu[MAX_CPU];
 
 static int sched_index[MAX_CPU];
 
@@ -19,7 +19,7 @@ sched_startup(void)
 void
 sched_insert(struct thread *td,int pri,int cpuid,flag_t flags)
 {
-    struct pcpu *pcpu = PCPU_GET(cpuid);
+    struct pcpu *pcpu = &cpu_pcpu[cpuid];
     struct thread *var;
     struct proc *p = td->td_proc;
 
@@ -93,15 +93,34 @@ sched_switch(void)
 {
     static int pri = 63;
     struct thread *old_td, *new_td;
+    struct pcb *curpcb;
     int cpuid;
     struct mtx td_lock;
 
     old_td = curthread;
     cpuid = CURPCPU_GET(cpuid);
     new_td = sched_choose(cpuid,SCHED_RUNQ);
-    cpu_switch(old_td, new_td,);
+
+    if(new_td) return;
+
+    THREAD_LOCK(&new_td->td_lock);
+    old_td->td_state &= ~(TDS_RUNNING );
+    old_td->td_state |= (TDS_READY);
+    THREAD_LOCK(&new_td->td_lock);
+
+    THREAD_LOCK(&new_td->td_lock);
+    new_td->td_state &= ~(TDS_READY | TDS_NEW | TDS_SLEEPING );
+    new_td->td_state |= (TDS_RUNNING);
+    THREAD_LOCK(&new_td->td_lock);
+    cpu_switch(old_td, new_td,td_lock);
+    
+
+
     curpcpu = &cpu_pcpu[new_td->td_cpuid];
     curthread = new_td;
+    curpcb = new_td->td_pcb;
 
-    
+    pcpu_setcurpcb(cpuid, curpcb);
+    pcpu_setcurthread(cpuid, curthread);
+    pcpu_setcurproc(cpuid, new_td->td_proc);
 }

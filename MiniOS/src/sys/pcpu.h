@@ -14,14 +14,16 @@ struct proc;
 
 
 struct pcpu {
-    LIST_HEAD(,thread)  pcpu_runq[MAX_GROUPS - 1];
-    LIST_HEAD(,thread)  pcpu_sleepq[MAX_GROUPS - 1];
-    LIST_HEAD(,proc)    pcpu_list;
-    struct thread *     pcpu_curthread;
-    struct proc *       pcpu_curproc;
-    uint32_t            pcpu_cpuid;
+    struct mtx          pc_lock;
+    LIST_HEAD(,thread)  pc_runq[MAX_GROUPS - 1];
+    LIST_HEAD(,thread)  pc_sleepq[MAX_GROUPS - 1];
+    LIST_HEAD(,proc)    pc_list;
+    struct thread *     pc_curthread;
+    struct proc *       pc_curproc;
+    struct pcpu *       pc_curpcb;
+    uint32_t            pc_cpuid;
 };
 
-#define CURPCPU_GET(element)       (curpcpu->pcpu_##element)
+#define CURPCPU_GET(element)       (curpcpu->pc_##element)
 
 #endif

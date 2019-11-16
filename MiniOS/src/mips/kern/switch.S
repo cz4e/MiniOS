@@ -28,6 +28,12 @@ LEAF(savectx)
     move v0, zero
 END(savectx)
 
+
+/*  a0, old
+    a1, new
+    a2, mtx
+*/
+
 NESTED(cpu_switch, CALLFRAME_SIZ, ra)
     mfc0    t0, MIPS_COP_0_STATUS
     nop
@@ -67,12 +73,14 @@ mips_sw1:
     PTR_L   a2, TD_PCB(a1)
     PTR_S   a2, PC_CURPCB(a3)
     PTR_L   v0, TD_KSTACK(a1)
+    PTR_L   s0, MIPS_KSEG2_START
+
 
     PTR_L   s0, TD_PCB(s7)
     RESTORE_U_PCB_CONTEXT(sp, PCB_REG_SP, s0)
-    PTL_LA  t1, _C_LABLE(pmap_active)
-    jalr    t1
-    move    a0, s7
+//    PTL_LA  t1, _C_LABLE(pmap_activate)
+//    jalr    t1
+//    move    a0, s7
 
     move    a0, s0
     move    a1, s1

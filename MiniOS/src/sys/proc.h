@@ -39,7 +39,7 @@ struct thread {
     LIST_ENTRY(thread)  td_runq;                    /* Running queue                */
     LIST_ENTRY(thread)  td_sleepq;                  /* sleeping queue               */
     struct proc *       td_proc;                    /*                              */
-    struct mtx          td_mtx;                     /* Mutual exclusion             */
+    struct mtx          td_lock;                    /* Mutual exclusion             */
     uint64_t            td_flags;
     vm_addr_t           td_addr;                    /* Thread's base address        */
     size_t              td_size;                    /* The size of memory space     */
